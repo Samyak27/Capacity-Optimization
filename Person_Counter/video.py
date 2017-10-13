@@ -18,9 +18,6 @@ from flask import make_response
 import requests
 
 
-
-# from flask_sqlalchemy import SQLAlchemy 
-
 app = Flask(__name__)
 #admin=Admin(app)
 
@@ -54,7 +51,7 @@ if __name__ == '__main__':
 cnt_up   = 0
 cnt_down = 0
 
-#Video Source
+#Video Source(Can Either Use inbuilt Camera/USB camera)
 #cap = cv2.VideoCapture(0)
 cap = cv2.VideoCapture('peopleCounter.avi')
 
@@ -129,7 +126,7 @@ while(cap.isOpened()):
     for i in persons:
         i.age_one() #age every person one frame
     #########################
-    #   PRE-PROCESSING   #
+    #   PRE-PROCESSING      #
     #########################
     
     #Apply subtraction of background
