@@ -1,3 +1,4 @@
+#this is a server client socket connection from person counter to a server from which the data will be further send to webapp and database
 import pickle
 import socket
 
@@ -16,7 +17,7 @@ s.listen(1)
 conn, addr = s.accept()
 
 print "conn info: ", conn
-while True:
+while True:#to get all the counts
     objrcv = pickle.loads ( conn.recv ( 1024 ) )
     print "conn recv: ", objrcv
     print "conn from: ", addr
