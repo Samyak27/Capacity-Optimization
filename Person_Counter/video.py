@@ -12,6 +12,10 @@ import string
 import time
 
 
+#admin=Admin(app)
+
+#CLIENT_ID = json.loads(
+ #   open('client_secrets.json', 'r').read())['web']['client_id']
 
 
 #Input and Output Counters
@@ -24,8 +28,8 @@ cobj = foo()
 client = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
 client.connect (('192.168.31.10', 5005))
 #Video Source
-#cap = cv2.VideoCapture(0)
-cap = cv2.VideoCapture('peopleCounter.avi')
+cap = cv2.VideoCapture(0)
+#cap = cv2.VideoCapture('peopleCounter.avi')
 
 #Video Properties
 ##cap.set(3,160) #Width
@@ -231,5 +235,11 @@ while(cap.isOpened()):
     if k == 27:
         break
 #END while(cap.isOpened())
-client.close()
+#client.close()
 
+    
+#################
+#   CLEANING    #
+#################
+cap.release()
+cv2.destroyAllWindows()
