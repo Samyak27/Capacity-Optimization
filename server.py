@@ -10,7 +10,10 @@ from database import Base,Iot_Counter
 import random
 import string
 import time
+import pymongo
+import datetime
 
+from pymongo import MongoClient
 # IMPORTS FOR AUTHENTICATION
 
 
@@ -46,6 +49,11 @@ admin.add_view(ModelView(Iot_Counter,session))
 
 
 
+
+client = MongoClient('mongodb://localhost:27017/')
+db = client['messCapa']
+collection = db['dataTable']
+
 class foo(object):
     pass
 
@@ -59,6 +67,9 @@ s.listen(1)
 
 conn, addr = s.accept()
 
+i=0
+a=0
+
 #data_json={}
 
 print "conn info: ", conn
@@ -69,35 +80,22 @@ while True:
     if objrcv.Y == 0:
         print 'down count'
         print objrcv.X
+        global i
+        i = 0
         i = str(objrcv.X)
-        #j = str(objrcv.Y)
-        #k = i + " " + j
-        currentTime=time.ctime(time.time()) +"\r\n"
-        Iot_Counter_1=Iot_Counter(up_count=0,down_count=i,)
+        result = db.dataTable.insert_one({"downcount": i})
 
-
-        session.add(Iot_Counter_1)
-        session.commit()
-        #print k
-        data_json = i
-        #yahaan se down jaaega
+#yahaan se tujhe i ko database pe daalna hai
     elif objrcv.Y == -1:
         print "upcount"
         print  objrcv.X
+        global a
+        a = 0
         a = str(objrcv.X)
 
-        #b = str(objrcv.Y)
-        #c = a + " " + b
-        #print c
-        #data_json = a
-
-
-
-        Iot_Counter_2=Iot_Counter(up_count=a,down_count=i,
-                )
-
-        session.add(Iot_Counter_2)
-        session.commit()
+        result = db.dataTable.insert_one({"upCount": a})
+        y = int(a) - int(i)
+        result = db.dataTable.insert_one({"totalCountofpeople": y})
 
 
 #    parsed = json.loads(data_json)
