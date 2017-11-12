@@ -3,55 +3,27 @@ import cv2
 import Person
 import time
 
+import pickle
+import socket
 
-
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+#from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
 import random
 import string
 import time
 
-# IMPORTS FOR AUTHENTICATION
-
-import httplib2
-import json
-from flask import make_response
-import requests
-
-
-app = Flask(__name__)
-#admin=Admin(app)
-
-#CLIENT_ID = json.loads(
- #   open('client_secrets.json', 'r').read())['web']['client_id']
-APPLICATION_NAME = "Person Counter"
-
-# API IMPLEMENTATION 
-
-@app.route("/api_responce", methods = ['GET', 'POST'])
-def api_responce(counter,counter_2,timer,timer_2):
-
-	output={
-		'counter_up':counter,
-		'counter_down':counter_2,
-		'timer_up':timer,
-		'timer_down':timer_2,
-	
-	}
-
-	return json.dumps(output)
-if __name__ == '__main__':
-    #app.secret_key = 'super_secret_key'
-    app.debug = True
-    #app.run(host='192.168.43.5', port=80)
-    app.run(host='0.0.0.0', port=5000)
 
 
 
 #Input and Output Counters
+class foo(object):   pass
 cnt_up   = 0
 cnt_down = 0
+cobj = foo()
 
-#Video Source(Can Either Use inbuilt Camera/USB camera)
+
+client = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
+client.connect (('192.168.31.10', 5005))
+#Video Source
 #cap = cv2.VideoCapture(0)
 cap = cv2.VideoCapture('peopleCounter.avi')
 
@@ -126,7 +98,7 @@ while(cap.isOpened()):
     for i in persons:
         i.age_one() #age every person one frame
     #########################
-    #   PRE-PROCESSING      #
+    #   PRE-PROCESSING   #
     #########################
     
     #Apply subtraction of background
@@ -177,6 +149,10 @@ while(cap.isOpened()):
                         i.updateCoords(cx,cy)   #update coordinates in the object and resets age
                         if i.going_UP(line_down,line_up) == True:			
                             cnt_up += 1;
+                            cobj.X = cnt_up
+                            cobj.Y = -1
+                            objList = pickle.dumps ( cobj )
+                            client.send(objList)
                             counter=i.getId();
 										
                             print "ID:",i.getId(),'crossed going up at',time.strftime("%c")
@@ -184,6 +160,11 @@ while(cap.isOpened()):
 							
                         elif i.going_DOWN(line_down,line_up) == True:
                             cnt_down += 1;
+                            cobj.X = cnt_down
+                            cobj.Y = 0
+                            objList = pickle.dumps ( cobj )
+                            client.send(objList)
+
                             print "ID:",i.getId(),'crossed going down at',time.strftime("%c")
                             counter_2=i.getId();
                             timer_2=time.strftime("%c");
@@ -205,7 +186,6 @@ while(cap.isOpened()):
                     p = Person.MyPerson(pid,cx,cy, max_p_age)
                     persons.append(p)
                     pid += 1
-                    api_responce(counter,counter_2,timer,timer_2)
 				
             #################
             #   DRAWINGS    #
@@ -251,11 +231,5 @@ while(cap.isOpened()):
     if k == 27:
         break
 #END while(cap.isOpened())
+client.close()
 
-    
-    
-#################
-#   CLEANING    #
-#################
-cap.release()
-cv2.destroyAllWindows()
